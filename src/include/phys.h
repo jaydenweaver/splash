@@ -6,14 +6,15 @@
 
 // simulation constants
 //-----------------------------------
-constexpr int PARTICLE_COUNT = 3000;
-constexpr float DENSITY = 0.1f;
+constexpr int PARTICLE_COUNT = 1000;
+constexpr float DENSITY = 0.22f;
 constexpr float STIFFNESS = 100.0f;
-constexpr float H = 4.0f;
+constexpr float H = 8.0f;
 constexpr float MASS = 1.0f;
-constexpr float VISCOSITY = 0.01f;
-constexpr float DT = 0.15f;
+constexpr float VISCOSITY = 0.1f;
+constexpr float DT = 0.03f;
 constexpr float GRAVITY = 9.8f;
+constexpr float BOUNCE_DAMPENING = 0.2f;
 //-----------------------------------
 
 struct Particle {

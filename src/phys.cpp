@@ -9,7 +9,6 @@ void update(std::vector<int>& grid, int width, int height) {
     compute_density_pressure();
     compute_forces();
     integrate(width, height);
-
     fill(grid.begin(), grid.end(), 0);
     for (Particle p : particles) {
         grid[static_cast<int>(p.y) * width + static_cast<int>(p.x)]++;
@@ -18,8 +17,8 @@ void update(std::vector<int>& grid, int width, int height) {
 
 void spawn(int width, int height) {
     int count = 0;
-    for (int y = 50; y < 150 && count < PARTICLE_COUNT; y += 5) {
-        for (int x = 50; x < 150 && count < PARTICLE_COUNT; x += 5) {
+    for (int y = 0; y < 50 && count < PARTICLE_COUNT; y++) {
+        for (int x = 25; x < 75 && count < PARTICLE_COUNT; x++) {
             particles.push_back({static_cast<float>(x), static_cast<float>(y), 0.1f * (rand() % 10 - 5), 0.0f});
             count++;
         }
@@ -77,10 +76,9 @@ void compute_forces() {
             float r = sqrt(r2);
 
             if (r < H && r > 0.0001f) {
-                float p_term = (p.pressure + p2.pressure) / (2.0f * p2.density);
-                float gradient = pressure_gradient(r);
-                fx -= MASS * p_term * gradient * (dx / r);
-                fy -= MASS * p_term * gradient * (dy / r);
+                float p_term = (p.pressure / (p.density * p.density) + p2.pressure / (p2.density * p2.density));
+                fx += MASS * p_term * pressure_gradient(r) * (dx / r);
+                fy += MASS * p_term * pressure_gradient(r) * (dy / r);
 
                 float vf = viscosity(r);
                 fx += VISCOSITY * MASS * (p2.vx - p.vx) / p2.density * vf;
@@ -111,19 +109,19 @@ void integrate(int width, int height) {
         // bounds check
         if (p.x < 0) {
             p.x = 0;
-            p.vx *= -0.0005f;
+            p.vx *= -1.0f * BOUNCE_DAMPENING;
         }
         if (p.x > width - 1) {
             p.x = width - 1;
-            p.vx *= -0.0005f;
+            p.vx *= -1.0f * BOUNCE_DAMPENING;
         }
         if (p.y < 0) {
             p.y = 0;
-            p.vy *= -0.0005f;
+            p.vy *= -1.0f * BOUNCE_DAMPENING;
         }
         if (p.y > height - 1) {
             p.y = height - 1;
-            p.vy *= -0.0005f;
+            p.vy *= -1.0f * BOUNCE_DAMPENING;
         }
     }
 }
