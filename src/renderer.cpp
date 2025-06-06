@@ -5,7 +5,7 @@ char density_to_char(int density) {
     if (density < 2) return '.';
     if (density < 4) return ':';
     if (density < 8) return '=';
-    if (density < 15) return '#';
+    if (density < 1500) return '#';
     return '#';
 }
 
@@ -40,8 +40,8 @@ void render(const std::vector<int>& grid, int grid_width, int grid_height) {
                 }
             }
 
-            int density_average = sum;
-            char c = density_to_char(density_average);
+            int density_average = (count > 0) ? (sum / count) : 0;
+            char c = density_to_char(sum);
 
             mvaddch(y, x, c);
         }
