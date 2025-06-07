@@ -3,8 +3,8 @@
 #include <unistd.h>
 #include <vector>
 
-const int X_RES = 100;
-const int Y_RES = 50;
+const int X_RES = 500;
+const int Y_RES = 200;
 
 int main() {
     // 'high' resolution 2d grid for simulation - renderer downscales to fit within CLI

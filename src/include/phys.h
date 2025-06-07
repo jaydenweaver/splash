@@ -6,14 +6,14 @@
 
 // simulation constants
 //-----------------------------------
-constexpr int PARTICLE_COUNT = 1000;
-constexpr float DENSITY = 0.22f;
+constexpr int PARTICLE_COUNT = 2000;
+constexpr float DENSITY = 0.02f;
 constexpr float STIFFNESS = 100.0f;
 constexpr float H = 8.0f;
 constexpr float MASS = 1.0f;
 constexpr float VISCOSITY = 0.1f;
 constexpr float DT = 0.03f;
-constexpr float GRAVITY = 9.8f;
+constexpr float GRAVITY = 50.0f;
 constexpr float BOUNCE_DAMPENING = 0.2f;
 //-----------------------------------
 

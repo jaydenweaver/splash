@@ -17,8 +17,8 @@ void update(std::vector<int>& grid, int width, int height) {
 
 void spawn(int width, int height) {
     int count = 0;
-    for (int y = 0; y < 50 && count < PARTICLE_COUNT; y++) {
-        for (int x = 25; x < 75 && count < PARTICLE_COUNT; x++) {
+    for (int y = 0; y < width && count < PARTICLE_COUNT; y++) {
+        for (int x = 0; x < height && count < PARTICLE_COUNT; x++) {
             particles.push_back({static_cast<float>(x), static_cast<float>(y), 0.1f * (rand() % 10 - 5), 0.0f});
             count++;
         }
