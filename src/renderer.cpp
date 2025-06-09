@@ -12,7 +12,11 @@ char density_to_char(int density) {
 void init_renderer() {
     initscr();
     noecho();
+    nodelay(stdscr, TRUE);
+    raw();
     curs_set(0);
+    keypad(stdscr, TRUE);
+    mousemask(ALL_MOUSE_EVENTS, NULL);
 }
 
 void close_renderer() { endwin(); }

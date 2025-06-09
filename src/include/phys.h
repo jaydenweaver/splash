@@ -15,6 +15,8 @@ constexpr float VISCOSITY = 0.1f;
 constexpr float DT = 0.03f;
 constexpr float GRAVITY = 50.0f;
 constexpr float BOUNCE_DAMPENING = 0.2f;
+constexpr float BLAST_RADIUS = 100.0f;
+constexpr float BLAST_STRENGTH = 250.0f;
 //-----------------------------------
 
 struct Particle {
@@ -36,3 +38,4 @@ void compute_density_pressure();
 void compute_forces();
 void integrate(int, int);
 
+void explode(float, float);

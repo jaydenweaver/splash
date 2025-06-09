@@ -12,10 +12,23 @@ int main() {
 
     init_renderer();
     spawn(X_RES, Y_RES);
+    MEVENT event;
+
     while (true) {
+        int input = getch();
+        if (input == 'q') break;
+
+        if (input == KEY_MOUSE && getmouse(&event) == OK) {
+            int terminal_width, terminal_height;
+            getmaxyx(stdscr, terminal_height, terminal_width);
+            if (event.bstate & BUTTON1_CLICKED) {
+                explode((float) event.x * (X_RES / terminal_width), (float) event.y * (Y_RES / terminal_height));
+            }
+        }
+
         update(grid, X_RES, Y_RES);
         render(grid, X_RES, Y_RES);
-        napms(16);
+        napms(8);
     }
     
     close_renderer();

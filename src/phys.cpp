@@ -125,3 +125,19 @@ void integrate(int width, int height) {
         }
     }
 }
+
+void explode(float x, float y) {
+    for (Particle& p : particles) {
+        float dx = p.x - x;
+        float dy = p.y - y;
+        float r = sqrt(dx * dx + dy * dy);
+
+        if (r < BLAST_RADIUS && r > 0.0001f) {
+            float nx = dx / r;
+            float ny = dy / r;
+            float force = BLAST_STRENGTH * (1.0f - r / BLAST_RADIUS);
+            p.vx += nx * force;
+            p.vy += ny * force;
+        }
+    }
+}
