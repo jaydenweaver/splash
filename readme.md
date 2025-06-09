@@ -1,5 +1,7 @@
 # Splash
 
+![splash simulation demo](splash_demo.gif)
+
 A terminal-based fluid simulation powered by **Smoothed Particle Hydrodynamics (SPH)** and rendered using ASCII art via `ncurses`. Interact with the fluid in real-time by clicking to trigger dynamic explosions within the simulation grid.
 
 ---
