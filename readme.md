@@ -8,7 +8,7 @@ A terminal-based fluid simulation powered by **Smoothed Particle Hydrodynamics (
 
 **Requirements:**
 
-- C++17-compatible compiler  
+- C++17 compatible compiler  
 - `ncurses` development library (e.g., `libncurses-dev` on Ubuntu/Debian)
 
 **Compile with:**
@@ -32,15 +32,15 @@ Run the compiled binary:
 
 ## Project Structure
 
-splash/
-├── build/ # Output directory for binaries
-├── src/
-│ ├── splash.cpp # Main loop and input handling
-│ ├── phys.cpp # SPH simulation logic
-│ ├── renderer.cpp # ASCII renderer using ncurses
-├── include/
-│ └── phys.h # Shared constants and structures
-└── README.md
+splash/  
+├── build/ # Output directory for binaries  
+├── src/  
+│ ├── splash.cpp # Main loop and input handling  
+│ ├── phys.cpp # SPH simulation logic  
+│ ├── renderer.cpp # ASCII renderer using ncurses  
+├── include/  
+│ └── phys.h # Shared constants and structures  
+└── README.md  
 
 ---
 
