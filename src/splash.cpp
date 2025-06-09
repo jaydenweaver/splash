@@ -22,7 +22,7 @@ int main() {
             int terminal_width, terminal_height;
             getmaxyx(stdscr, terminal_height, terminal_width);
             if (event.bstate & BUTTON1_CLICKED) {
-                explode((float) event.x * (X_RES / terminal_width), (float) event.y * (Y_RES / terminal_height));
+                explode((float) event.x * (static_cast<float>(X_RES) / terminal_width), (float) event.y * static_cast<float>(Y_RES) / terminal_height);
             }
         }
 
