@@ -32,15 +32,17 @@ Run the compiled binary:
 
 ## Project Structure
 
-splash/  
-├── build/ # Output directory for binaries  
-├── src/  
-│ ├── splash.cpp # Main loop and input handling  
-│ ├── phys.cpp # SPH simulation logic  
-│ ├── renderer.cpp # ASCII renderer using ncurses  
-├── include/  
-│ └── phys.h # Shared constants and structures  
-└── README.md  
+```text
+splash/
+├── build/           # Output directory for binaries
+├── src/
+│   ├── splash.cpp   # Main loop and input handling
+│   ├── phys.cpp     # SPH simulation logic
+│   ├── renderer.cpp # ASCII renderer using ncurses
+├── include/
+│   └── phys.h       # Shared constants and structures
+└── README.md
+```
 
 ---
 
