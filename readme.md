@@ -43,6 +43,7 @@ splash/
 │   ├── renderer.cpp # ASCII renderer using ncurses
 ├── include/
 │   └── phys.h       # Shared constants and structures
+│   └── renderer.h   # Shared structures
 └── README.md
 ```
 
@@ -60,13 +61,13 @@ splash/
 
 The simulation implements a simplified 2D **Smoothed Particle Hydrodynamics** (SPH) framework:
 
-- **Density Estimation**: Poly6 smoothing kernel based on particle distance squared  
-- **Pressure Force**: Derived from a pressure gradient using the SPH pressure formula  
-- **Viscosity**: Models fluid internal friction with a simple linear viscosity kernel  
-- **Gravity**: Constant downward force applied to all particles  
-- **Integration**: Explicit Euler integration for velocity and position updates  
-- **Boundaries**: Reflective edge collisions with dampening  
-- **Explosions**: Radial force fields applied to particles within a blast radius when clicked
+- **Density Estimation**: smoothing kernel based on particle distance squared  
+- **Pressure Force**: derived from a pressure gradient using the SPH pressure formula  
+- **Viscosity**: models fluid internal friction with a simple linear viscosity kernel  
+- **Gravity**: constant downward force applied to all particles  
+- **Integration**: explicit Euler integration for velocity and position updates  
+- **Boundaries**: reflective edge collisions with dampening  
+- **Explosions**: radial force fields applied to particles within a blast radius when clicked
 
 ---
 
