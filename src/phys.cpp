@@ -1,14 +1,28 @@
 #include <phys.h>
 
 // simulation utilises an implementation of SPH - smooth particle hydrodynamics
-// also involves spatial hashing to reduce runtime complexity | O(n^2) -> O(nm), n = particle count, m = neighbouring particle count
 
+struct cell_key_hash {
+    size_t operator()(const cell_key& k) const {
+        return std::hash<int>()(k.first) ^ (std::hash<int>()(k.second << 1));
+    }
+};
+
+std::unordered_map<cell_key, std::vector<Particle*>, cell_key_hash> spatial_map;
 std::vector<Particle> particles;
 
 void update(std::vector<int>& grid, int width, int height) {
+    spatial_map.clear();
+    for (Particle& p : particles) {
+        int cx = get_cell_x(p, SPATIAL_CELL);
+        int cy = get_cell_y(p, SPATIAL_CELL);
+        spatial_map[{cx, cy}].push_back(&p);
+    }
+
     compute_density_pressure();
     compute_forces();
     integrate(width, height);
+
     fill(grid.begin(), grid.end(), 0);
     for (Particle p : particles) {
         grid[static_cast<int>(p.y) * width + static_cast<int>(p.x)]++;
@@ -53,12 +67,21 @@ float viscosity(float r) {
 void compute_density_pressure() {
     for (Particle& p : particles) {
         p.density = 0.0f;
-        for(Particle& p2 : particles) {
-            float dx = p2.x - p.x;
-            float dy = p2.y - p.y;
-            
-            float r2 = dx * dx + dy * dy;
-            p.density += MASS * density(r2);
+        int cx = get_cell_x(p, SPATIAL_CELL);
+        int cy = get_cell_y(p, SPATIAL_CELL);
+
+        for (int jx = -1; jx <= 1; jx++) {
+            for (int jy = -1; jy <= 1; jy++) {
+                cell_key key = {cx + jx, cy + jy};
+                if (spatial_map.find(key) == spatial_map.end()) continue;
+
+                for (Particle* p2 : spatial_map[key]) {
+                    float dx = p2->x - p.x;
+                    float dy = p2->y - p.y;
+                    float r2 = dx * dx + dy * dy;
+                    p.density += MASS * density(r2);
+                }
+            }
         }
         p.pressure = STIFFNESS * std::max(p.density - DENSITY, 0.0f);
     }
@@ -67,24 +90,35 @@ void compute_density_pressure() {
 void compute_forces() {
     for (Particle& p : particles) {
         float fx = 0.0f, fy = 0.0f;
-        for (Particle& p2 : particles) {
-            if (&p == &p2) continue;
+        int cx = get_cell_x(p, SPATIAL_CELL);
+        int cy = get_cell_y(p, SPATIAL_CELL);
 
-            float dx = p2.x - p.x;
-            float dy = p2.y - p.y;
-            float r2 = dx * dx + dy * dy;
-            float r = sqrt(r2);
+        for (int jx = -1; jx <= 1; jx++) {
+            for (int jy = -1; jy <= 1; jy++) {
+                cell_key key = {cx + jx, cy + jy};
+                if (spatial_map.find(key) == spatial_map.end()) continue;
 
-            if (r < H && r > 0.0001f) {
-                float p_term = (p.pressure / (p.density * p.density) + p2.pressure / (p2.density * p2.density));
-                fx += MASS * p_term * pressure_gradient(r) * (dx / r);
-                fy += MASS * p_term * pressure_gradient(r) * (dy / r);
+                for (Particle* p2 : spatial_map[key]) {
+                    if (&p == p2) continue;
 
-                float vf = viscosity(r);
-                fx += VISCOSITY * MASS * (p2.vx - p.vx) / p2.density * vf;
-                fy += VISCOSITY * MASS * (p2.vy - p.vy) / p2.density * vf;
+                    float dx = p2->x - p.x;
+                    float dy = p2->y - p.y;
+                    float r2 = dx * dx + dy * dy;
+                    float r = sqrt(r2);
+
+                    if (r < H && r > 0.0001f) {
+                        float p_term = (p.pressure / (p.density * p.density) + p2->pressure / (p2->density * p2->density));
+                        fx += MASS * p_term * pressure_gradient(r) * (dx / r);
+                        fy += MASS * p_term * pressure_gradient(r) * (dy / r);
+
+                        float vf = viscosity(r);
+                        fx += VISCOSITY * MASS * (p2->vx - p.vx) / p2->density * vf;
+                        fy += VISCOSITY * MASS * (p2->vy - p.vy) / p2->density * vf;
+                    }
+                }
             }
         }
+
         fy += GRAVITY * p.density;
         if (p.density < 1e-6f) p.density = 1e-6f;
 
@@ -103,8 +137,6 @@ void integrate(int width, int height) {
 
         p.x += DT * p.vx;
         p.y += DT * p.vy;
-
-
         
         // bounds check
         if (p.x < 0) {
@@ -140,4 +172,12 @@ void explode(float x, float y) {
             p.vy += ny * force;
         }
     }
+}
+
+int get_cell_x(Particle& p, int cell_size) {
+    return floor(p.x / cell_size);
+}
+
+int get_cell_y(Particle& p, int cell_size) {
+    return floor(p.y / cell_size);
 }
