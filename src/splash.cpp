@@ -26,8 +26,8 @@ int main(int argc, char* argv[]) {
   // within CLI
   std::vector<int> grid(X_RES * Y_RES, 0);
 
-  uint64_t sum = 0;
-  uint64_t frames = 0;
+  uint64_t tick_sum = 0; // tick time (ms)
+  uint64_t ticks = 0;
 
   init_renderer();
   spawn(X_RES, Y_RES);
@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
 
   while (true) {
 
-    if (run_time_ms > 0 && sum > run_time_ms) break;
+    if (run_time_ms > 0 && tick_sum > run_time_ms) break;
 
     int input = getch();
     if (input == 'q')
@@ -51,15 +51,15 @@ int main(int argc, char* argv[]) {
     }
 
     sum += update(grid, X_RES, Y_RES);
-    frames++;
+    ticks++;
     render(grid, X_RES, Y_RES);
     napms(8);
   }
 
   close_renderer();
-  int16_t avg_tick = sum / frames;
+  int16_t avg_tick = tick_sum / ticks;
   int16_t ticks_per_second = 1000 / avg_tick;
-  int run_time = sum / 1000;
+  int run_time = tick_sum / 1000;
   std::cout << "------- splash - "<< run_time << " seconds -------" << std::endl;
   std::cout << "average update tick time: " <<  avg_tick << " ms" << std::endl;
   std::cout << "average update ticks per second: " <<  ticks_per_second << std::endl;
