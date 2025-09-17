@@ -4,6 +4,7 @@
 #include <ncurses.h>
 #include <iostream>
 #include <unordered_map>
+#include <chrono>
 
 // simulation constants
 //-----------------------------------
@@ -32,7 +33,7 @@ struct Particle {
 
 using cell_key = std::pair<int, int>;
 
-void update(std::vector<int>&, int, int);
+int64_t update(std::vector<int>&, int, int);
 void spawn(int, int);
 
 float density(float);
