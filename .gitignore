@@ -33,5 +33,6 @@
 
 # builds
 build/
+.vscode
 
 .DS_Store

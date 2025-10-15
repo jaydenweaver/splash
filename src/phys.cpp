@@ -13,6 +13,7 @@ std::vector<Particle> particles;
 
 void update(std::vector<int>& grid, int width, int height) {
     spatial_map.clear();
+
     for (Particle& p : particles) {
         int cx = get_cell_x(p, SPATIAL_CELL);
         int cy = get_cell_y(p, SPATIAL_CELL);
@@ -24,7 +25,7 @@ void update(std::vector<int>& grid, int width, int height) {
     integrate(width, height);
 
     fill(grid.begin(), grid.end(), 0);
-    for (Particle p : particles) {
+    for (const Particle& p : particles) {
         grid[static_cast<int>(p.y) * width + static_cast<int>(p.x)]++;
     }
 }

@@ -4,6 +4,7 @@
 #include <ncurses.h>
 #include <iostream>
 #include <unordered_map>
+#include <chrono>
 
 // simulation constants
 //-----------------------------------
