@@ -33,6 +33,6 @@
 
 # builds
 build/
-.vscode
+.vscode/
 
 .DS_Store
