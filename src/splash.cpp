@@ -8,6 +8,7 @@
 const int X_RES = 500;
 const int Y_RES = 200;
 
+// single-thread version
 int main(int argc, char* argv[]) {
     int run_time_ms = 0; // 0 is no limit
 
