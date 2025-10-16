@@ -62,16 +62,19 @@ int main(int argc, char* argv[]) {
 
 
         ticks++;
+
         render(grid, X_RES, Y_RES);
-        napms(8);
+        //napms(8);
     }
 
     close_renderer();
     double avg_tick = tick_sum / static_cast<double>(ticks);
     double ticks_per_second = 1000.0 / avg_tick;
-    double run_time = tick_sum / 1000.0;
-    std::cout << "------- splash - "<< run_time << " seconds -------" << std::endl;
-    std::cout << "average update tick time: " <<  avg_tick << " ms" << std::endl;
-    std::cout << "average update ticks per second: " <<  ticks_per_second << std::endl;
+    int run_time = tick_sum / 1000;
+    std::cout << "\n----------------- SPLASH -----------------\n" << std::endl;
+    std::cout << "   average update tick time: " <<  avg_tick << " ms" << std::endl;
+    std::cout << " average update ticks per second: " <<  ticks_per_second << "\n" << std::endl;
+    std::cout << "            ran for " <<  run_time << " seconds." << std::endl;
+    std::cout << "\n------------------------------------------\n" << std::endl;
     return 0;
 }

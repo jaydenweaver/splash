@@ -5,10 +5,14 @@
 #include <iostream>
 #include <unordered_map>
 #include <chrono>
+#include <thread>
+#include <atomic>
+#include <algorithm>
+#include <mutex>
 
 // simulation constants
 //-----------------------------------
-constexpr int PARTICLE_COUNT = 2500;
+constexpr int PARTICLE_COUNT = 5500;
 constexpr float DENSITY = 0.02f;
 constexpr float STIFFNESS = 100.0f;
 constexpr float H = 8.0f;
@@ -40,9 +44,9 @@ float density(float);
 float pressure_gradient(float);
 float viscosity(float);
 
-void compute_density_pressure();
-void compute_forces();
-void integrate(int, int);
+void compute_density_pressure_for_particle(Particle& p);
+void compute_forces_for_particle(Particle& p);
+void integrate_particle(Particle& p, int width, int height);
 
 void explode(float, float);
 
