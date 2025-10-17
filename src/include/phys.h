@@ -37,7 +37,8 @@ struct Particle {
 
 using cell_key = std::pair<int, int>;
 
-void update_sequential(std::vector<int>& grid, int width, int height)
+std::vector<Particle> get_particles();
+void update_sequential(std::vector<int>& grid, int width, int height);
 void update_mt(std::vector<int>&, int, int);
 void spawn(int, int);
 
@@ -48,6 +49,10 @@ float viscosity(float);
 void compute_density_pressure_for_particle(Particle& p);
 void compute_forces_for_particle(Particle& p);
 void integrate_particle(Particle& p, int width, int height);
+
+void compute_density_pressure();
+void compute_forces();
+void integrate(int, int);
 
 void explode(float, float);
 

@@ -29,6 +29,10 @@ struct cell_key_hash {
 std::unordered_map<cell_key, std::vector<Particle*>, cell_key_hash> spatial_map;
 std::vector<Particle> particles;
 
+std::vector<Particle> get_particles() {
+    return particles;
+}
+
 void update_sequential(std::vector<int>& grid, int width, int height) {
     spatial_map.clear();
 
@@ -131,9 +135,9 @@ void update_mt(std::vector<int>& grid, int width, int height) {
     }
 }
 
-
-
 void spawn(int width, int height) {
+    particles.clear();
+    srand(1234);
     int count = 0;
     for (int y = 0; y < width && count < PARTICLE_COUNT; y++) {
         for (int x = 0; x < height && count < PARTICLE_COUNT; x++) {
@@ -255,6 +259,101 @@ void integrate_particle(Particle& p, int width, int height) {
         p.vy *= -1.0f * BOUNCE_DAMPENING;
     }
 }
+
+void compute_density_pressure() {
+    for (Particle& p : particles) {
+        p.density = 0.0f;
+        int cx = get_cell_x(p, SPATIAL_CELL);
+        int cy = get_cell_y(p, SPATIAL_CELL);
+
+        for (int jx = -1; jx <= 1; jx++) {
+            for (int jy = -1; jy <= 1; jy++) {
+                cell_key key = {cx + jx, cy + jy};
+                if (spatial_map.find(key) == spatial_map.end()) continue;
+
+                for (Particle* p2 : spatial_map[key]) {
+                    float dx = p2->x - p.x;
+                    float dy = p2->y - p.y;
+                    float r2 = dx * dx + dy * dy;
+                    p.density += MASS * density(r2);
+                }
+            }
+        }
+        p.pressure = STIFFNESS * std::max(p.density - DENSITY, 0.0f);
+    }
+}
+
+void compute_forces() {
+    for (Particle& p : particles) {
+        float fx = 0.0f, fy = 0.0f;
+        int cx = get_cell_x(p, SPATIAL_CELL);
+        int cy = get_cell_y(p, SPATIAL_CELL);
+
+        for (int jx = -1; jx <= 1; jx++) {
+            for (int jy = -1; jy <= 1; jy++) {
+                cell_key key = {cx + jx, cy + jy};
+                if (spatial_map.find(key) == spatial_map.end()) continue;
+
+                for (Particle* p2 : spatial_map[key]) {
+                    if (&p == p2) continue;
+
+                    float dx = p2->x - p.x;
+                    float dy = p2->y - p.y;
+                    float r2 = dx * dx + dy * dy;
+                    float r = sqrt(r2);
+
+                    if (r < H && r > 0.0001f) {
+                        float p_term = (p.pressure / (p.density * p.density) + p2->pressure / (p2->density * p2->density));
+                        fx += MASS * p_term * pressure_gradient(r) * (dx / r);
+                        fy += MASS * p_term * pressure_gradient(r) * (dy / r);
+
+                        float vf = viscosity(r);
+                        fx += VISCOSITY * MASS * (p2->vx - p.vx) / p2->density * vf;
+                        fy += VISCOSITY * MASS * (p2->vy - p.vy) / p2->density * vf;
+                    }
+                }
+            }
+        }
+
+        fy += GRAVITY * p.density;
+        if (p.density < 1e-6f) p.density = 1e-6f;
+
+        p.ax = fx / p.density;
+        p.ay = fy / p.density;
+
+        if (std::isnan(p.ax) || std::isnan(p.ay))
+            p.ax = p.ay = 0;
+    }
+}
+
+void integrate(int width, int height) {
+    for (Particle& p : particles) {
+        p.vx += DT * p.ax;
+        p.vy += DT * p.ay;
+
+        p.x += DT * p.vx;
+        p.y += DT * p.vy;
+        
+        // bounds check
+        if (p.x < 0) {
+            p.x = 0;
+            p.vx *= -1.0f * BOUNCE_DAMPENING;
+        }
+        if (p.x > width - 1) {
+            p.x = width - 1;
+            p.vx *= -1.0f * BOUNCE_DAMPENING;
+        }
+        if (p.y < 0) {
+            p.y = 0;
+            p.vy *= -1.0f * BOUNCE_DAMPENING;
+        }
+        if (p.y > height - 1) {
+            p.y = height - 1;
+            p.vy *= -1.0f * BOUNCE_DAMPENING;
+        }
+    }
+}
+
 
 void explode(float x, float y) {
     for (Particle& p : particles) {
