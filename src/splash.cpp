@@ -80,6 +80,7 @@ int main(int argc, char* argv[]) {
     }
 
     uint64_t num_ticks = 0;
+    uint64_t num_particles = 5000; // default
     try {
         num_ticks = std::stoull(argv[1]);
         if (num_ticks == 0) throw std::invalid_argument("zero ticks");
@@ -88,14 +89,26 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    if (argc > 2) {
+        try {
+            num_particles = std::stoull(argv[2]);
+            if (num_particles <= 0)
+                throw std::invalid_argument("Number of particles must be positive");
+        } catch (...) {
+            std::cerr << "Invalid number of particles. Must be a positive integer.\n";
+            return 1;
+        }
+    }
+    set_particle_count(num_particles);
+
     init_renderer();
 
-    std::cout << "\n=== Running Sequential Version (" << num_ticks << " ticks) ===\n";
+    std::cout << "\n=== running sequential version (" << num_ticks << " ticks, " << num_particles << " particles) ===\n";
     spawn(X_RES, Y_RES); // reset particles
     run_simulation(false, num_ticks);
     std::vector<Particle> particles_seq = get_particles();
 
-    std::cout << "\n=== Running Parallel Version (" << num_ticks << " ticks) ===\n";
+    std::cout << "\n=== running parallel version (" << num_ticks << " ticks), " << num_particles << " particles) ===\n";
     spawn(X_RES, Y_RES); // reset particles
     run_simulation(true, num_ticks);
     std::vector<Particle> particles_par = get_particles();

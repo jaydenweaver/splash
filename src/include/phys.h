@@ -12,7 +12,7 @@
 
 // simulation constants
 //-----------------------------------
-constexpr int PARTICLE_COUNT = 10000;
+inline int PARTICLE_COUNT = 10000;
 constexpr float DENSITY = 0.02f;
 constexpr float STIFFNESS = 100.0f;
 constexpr float H = 8.0f;
@@ -26,6 +26,10 @@ constexpr float BLAST_STRENGTH = 250.0f;
 // length and width of cells in grid used for spatial hashing
 constexpr int SPATIAL_CELL = 20;
 //-----------------------------------
+
+inline void set_particle_count(int count) {
+    PARTICLE_COUNT = count;
+}
 
 struct Particle {
     float x, y;
