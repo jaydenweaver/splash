@@ -29,7 +29,26 @@ struct cell_key_hash {
 std::unordered_map<cell_key, std::vector<Particle*>, cell_key_hash> spatial_map;
 std::vector<Particle> particles;
 
-void update(std::vector<int>& grid, int width, int height) {
+void update_sequential(std::vector<int>& grid, int width, int height) {
+    spatial_map.clear();
+
+    for (Particle& p : particles) {
+        int cx = get_cell_x(p, SPATIAL_CELL);
+        int cy = get_cell_y(p, SPATIAL_CELL);
+        spatial_map[{cx, cy}].push_back(&p);
+    }
+
+    compute_density_pressure();
+    compute_forces();
+    integrate(width, height);
+
+    fill(grid.begin(), grid.end(), 0);
+    for (const Particle& p : particles) {
+        grid[static_cast<int>(p.y) * width + static_cast<int>(p.x)]++;
+    }
+}
+
+void update_mt(std::vector<int>& grid, int width, int height) {
     // clear global spatial map
     spatial_map.clear();
 
@@ -37,11 +56,11 @@ void update(std::vector<int>& grid, int width, int height) {
     std::vector<std::unordered_map<cell_key, std::vector<Particle*>, cell_key_hash>> local_maps;
     local_maps.resize(num_threads);
 
-    // Reserve roughly to reduce rehashing (optional)
+    // reserve 
     size_t approx_cells = (particles.size() / (SPATIAL_CELL * SPATIAL_CELL)) + 1;
     for (auto &lm : local_maps) lm.reserve(std::min<size_t>(approx_cells, 1024));
 
-    // Build spatial maps in parallel; each thread writes to its own local_maps[t]
+    // build spatial maps in parallel, each thread writes to its own local_maps[t]
     parallel_for(particles.size(),
         [&](size_t i, unsigned int t) {
             Particle& p = particles[i];
@@ -52,7 +71,7 @@ void update(std::vector<int>& grid, int width, int height) {
         num_threads
     );
 
-    // Merge local maps into global spatial_map (single-threaded)
+    // merge local maps into global spatial_map
     for (auto &lm : local_maps) {
         for (auto &entry : lm) {
             auto &key = entry.first;
@@ -62,7 +81,7 @@ void update(std::vector<int>& grid, int width, int height) {
         }
     }
 
-    // Parallel per-particle computation (reads spatial_map, writes only the particle)
+    // parallel per-particle computation (reads spatial_map, writes only the particle)
     parallel_for(particles.size(),
         [&](size_t i, unsigned int) {
             compute_density_pressure_for_particle(particles[i]);
@@ -84,8 +103,8 @@ void update(std::vector<int>& grid, int width, int height) {
         num_threads
     );
 
-    // Fill the output grid: use per-thread local histograms then merge to avoid atomics
-    // Create per-thread local int arrays sized to grid; merge at end.
+    // fill the output grid, use per-thread local histograms then merge to avoid atomics
+    // create per-thread local int arrays sized to grid; merge at end.
     size_t grid_size = static_cast<size_t>(width) * static_cast<size_t>(height);
     std::vector<std::vector<int>> thread_histograms(num_threads, std::vector<int>(grid_size, 0));
 

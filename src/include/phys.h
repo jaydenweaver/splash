@@ -12,7 +12,7 @@
 
 // simulation constants
 //-----------------------------------
-constexpr int PARTICLE_COUNT = 5500;
+constexpr int PARTICLE_COUNT = 10000;
 constexpr float DENSITY = 0.02f;
 constexpr float STIFFNESS = 100.0f;
 constexpr float H = 8.0f;
@@ -37,7 +37,8 @@ struct Particle {
 
 using cell_key = std::pair<int, int>;
 
-void update(std::vector<int>&, int, int);
+void update_sequential(std::vector<int>& grid, int width, int height)
+void update_mt(std::vector<int>&, int, int);
 void spawn(int, int);
 
 float density(float);

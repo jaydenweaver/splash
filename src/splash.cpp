@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
 
 
         auto start = std::chrono::high_resolution_clock::now();
-        update(grid, X_RES, Y_RES);
+        update_mt(grid, X_RES, Y_RES);
         auto end = std::chrono::high_resolution_clock::now();
 
         std::chrono::duration<double, std::milli> duration = end - start;
