@@ -52,11 +52,11 @@ void update_sequential(std::vector<int>& grid, int width, int height) {
     }
 }
 
-void update_mt(std::vector<int>& grid, int width, int height) {
+void update_mt(std::vector<int>& grid, int width, int height, int num_threads) {
     // clear global spatial map
     spatial_map.clear();
 
-    unsigned int num_threads = std::max(1u, std::thread::hardware_concurrency());
+    //unsigned int num_threads = std::max(1u, std::thread::hardware_concurrency());
     std::vector<std::unordered_map<cell_key, std::vector<Particle*>, cell_key_hash>> local_maps;
     local_maps.resize(num_threads);
 

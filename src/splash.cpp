@@ -21,7 +21,7 @@ bool compare_particles(const std::vector<Particle>& a, const std::vector<Particl
     return true;
 }
 
-void run_simulation(bool parallel, uint64_t total_ticks) {
+void run_simulation(int num_threads, uint64_t total_ticks) {
     std::vector<int> grid(X_RES * Y_RES, 0);
     double tick_sum = 0.0;
     uint64_t ticks = 0;
@@ -45,8 +45,8 @@ void run_simulation(bool parallel, uint64_t total_ticks) {
 
         auto tick_start = std::chrono::high_resolution_clock::now();
 
-        if (parallel)
-            update_mt(grid, X_RES, Y_RES);
+        if (num_threads > 1)
+            update_mt(grid, X_RES, Y_RES, num_threads);
         else
             update_sequential(grid, X_RES, Y_RES);
 
@@ -55,7 +55,7 @@ void run_simulation(bool parallel, uint64_t total_ticks) {
         tick_sum += tick_time.count();
         ticks++;
 
-        render(grid, X_RES, Y_RES);
+        //render(grid, X_RES, Y_RES);
         //napms(8); // optional frame delay
     }
 
@@ -65,7 +65,7 @@ void run_simulation(bool parallel, uint64_t total_ticks) {
     double ticks_per_second = 1000.0 / avg_tick;
 
     std::cout << "\n------------------------------------------\n";
-    std::cout << (parallel ? " PARALLEL RUN COMPLETE\n" : " SEQUENTIAL RUN COMPLETE\n");
+    std::cout << (num_threads > 1 ? " PARALLEL RUN COMPLETE\n" : " SEQUENTIAL RUN COMPLETE\n");
     std::cout << " Total ticks: " << ticks << "\n";
     std::cout << " Average tick time: " << avg_tick << " ms\n";
     std::cout << " Average ticks per second: " << ticks_per_second << "\n";
@@ -101,23 +101,44 @@ int main(int argc, char* argv[]) {
     }
     set_particle_count(num_particles);
 
-    init_renderer();
+    //init_renderer();
+
+    bool particles_match = true;
 
     std::cout << "\n=== running sequential version (" << num_ticks << " ticks, " << num_particles << " particles) ===\n";
     spawn(X_RES, Y_RES); // reset particles
-    run_simulation(false, num_ticks);
+    run_simulation(1, num_ticks);
     std::vector<Particle> particles_seq = get_particles();
 
-    std::cout << "\n=== running parallel version (" << num_ticks << " ticks), " << num_particles << " particles) ===\n";
+    std::cout << "\n=== running parallel version (" << num_ticks << " ticks, " << num_particles << " particles, 2 threads) ===\n";
     spawn(X_RES, Y_RES); // reset particles
-    run_simulation(true, num_ticks);
+    run_simulation(2, num_ticks);
     std::vector<Particle> particles_par = get_particles();
+    particles_match = compare_particles(particles_seq, particles_par);
 
-    close_renderer();
+    std::cout << "\n=== running parallel version (" << num_ticks << " ticks, " << num_particles << " particles, 4 threads) ===\n";
+    spawn(X_RES, Y_RES); // reset particles
+    run_simulation(4, num_ticks);
+    particles_par = get_particles();
+    if (particles_match) particles_match = compare_particles(particles_seq, particles_par);
+
+    std::cout << "\n=== running parallel version (" << num_ticks << " ticks, " << num_particles << " particles, 8 threads) ===\n";
+    spawn(X_RES, Y_RES); // reset particles
+    run_simulation(8, num_ticks);
+    particles_par = get_particles();
+    if (particles_match) particles_match = compare_particles(particles_seq, particles_par);
+    
+    std::cout << "\n=== running parallel version (" << num_ticks << " ticks, " << num_particles << " particles, 16 threads) ===\n";
+    spawn(X_RES, Y_RES); // reset particles
+    run_simulation(16, num_ticks);
+    particles_par = get_particles();
+    if (particles_match) particles_match = compare_particles(particles_seq, particles_par);
+
+    //close_renderer();
 
     std::cout << "\nSimulation finished.\n";
 
-    if (compare_particles(particles_seq, particles_par)) {
+    if (particles_match) {
         std::cout << "Particle states match.\n";
     } else {
         std::cout << "Particle states differ.\n";

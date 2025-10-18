@@ -43,7 +43,7 @@ using cell_key = std::pair<int, int>;
 
 std::vector<Particle> get_particles();
 void update_sequential(std::vector<int>& grid, int width, int height);
-void update_mt(std::vector<int>&, int, int);
+void update_mt(std::vector<int>&, int, int, int);
 void spawn(int, int);
 
 float density(float);
