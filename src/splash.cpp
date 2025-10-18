@@ -4,6 +4,7 @@
 #include <vector>
 #include <chrono>
 #include <iostream>
+#include <cstring>
 
 const int X_RES = 500;
 const int Y_RES = 200;
@@ -15,8 +16,9 @@ bool compare_particles(const std::vector<Particle>& a, const std::vector<Particl
         const Particle& p2 = b[i];
         if (fabs(p1.x - p2.x) > eps || fabs(p1.y - p2.y) > eps ||
             fabs(p1.vx - p2.vx) > eps || fabs(p1.vy - p2.vy) > eps ||
-            fabs(p1.density - p2.density) > eps || fabs(p1.pressure - p2.pressure) > eps)
-            return false;
+            fabs(p1.density - p2.density) > eps || fabs(p1.pressure - p2.pressure) > eps) return false;
+
+        if (memcmp(&p1, &p2, sizeof(Particle)) != 0) return false;
     }
     return true;
 }
