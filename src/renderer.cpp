@@ -54,7 +54,7 @@ void render_mt(const std::vector<int>& grid, int grid_width, int grid_height, in
 
     std::vector<std::thread> threads;
     int chunk = (term_height + num_threads - 1) / num_threads;
-    for (unsigned int t = 0; t < num_threads; ++t) {
+    for (int t = 0; t < num_threads; t++) {
         int start_y = t * chunk;
         int end_y = std::min(term_height, start_y + chunk);
         if (start_y < end_y)
@@ -62,7 +62,7 @@ void render_mt(const std::vector<int>& grid, int grid_width, int grid_height, in
     }
     for (auto& th : threads) th.join();
 
-    // draw to ncurses (single-threaded)
+    // draw to ncurses
     for (int y = 0; y < term_height; ++y) {
         for (int x = 0; x < term_width; ++x) {
             mvaddch(y, x, frame[y * term_width + x]);

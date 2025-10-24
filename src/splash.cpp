@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
 
     close_renderer();
 
-    // Print results table
+    // print results table
     std::cout << "\nSimulation complete (" << num_ticks << " ticks, " << num_particles << " particles)\n\n";
     std::cout << std::left
               << std::setw(10) << "Threads"

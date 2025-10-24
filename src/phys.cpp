@@ -4,12 +4,12 @@
 
 // parallel_for: passes (index, thread_id)
 template <typename Func>
-void parallel_for(size_t count, Func&& func, unsigned int num_threads) {
+void parallel_for(size_t count, Func&& func, int num_threads) {
     if (num_threads == 0) num_threads = 1;
     std::vector<std::thread> threads;
     size_t chunk_size = (count + num_threads - 1) / num_threads;
 
-    for (unsigned int t = 0; t < num_threads; ++t) {
+    for (int t = 0; t < num_threads; t++) {
         size_t start = t * chunk_size;
         size_t end = std::min(count, start + chunk_size);
         if (start >= end) break;
@@ -56,7 +56,7 @@ void update_mt(std::vector<int>& grid, int width, int height, int num_threads) {
     // clear global spatial map
     spatial_map.clear();
 
-    //unsigned int num_threads = std::max(1u, std::thread::hardware_concurrency());
+    // int num_threads = std::max(1u, std::thread::hardware_concurrency());
     std::vector<std::unordered_map<cell_key, std::vector<Particle*>, cell_key_hash>> local_maps;
     local_maps.resize(num_threads);
 
@@ -125,9 +125,9 @@ void update_mt(std::vector<int>& grid, int width, int height, int num_threads) {
         num_threads
     );
 
-    // reduce thread histograms into grid (single-threaded)
+    // reduce thread histograms into grid
     std::fill(grid.begin(), grid.end(), 0);
-    for (unsigned int t = 0; t < num_threads; ++t) {
+    for (int t = 0; t < num_threads; t++) {
         auto &h = thread_histograms[t];
         for (size_t idx = 0; idx < grid_size; ++idx) {
             if (h[idx] != 0) grid[idx] += h[idx];
